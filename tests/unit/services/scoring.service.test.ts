@@ -80,6 +80,35 @@ describe('calculateSalaryScore', () => {
 })
 
 describe('calculateTotalScore', () => {
+  it('returns a string (not a number) when an empty-string score is passed without a guard — documents the cleared-NumberInput bug', () => {
+    // Mantine's NumberInput emits "" when the field is cleared. TypeScript types
+    // the value as number, but the runtime value is "". Without a guard,
+    // JavaScript string-concatenates the result, causing .toFixed() to throw.
+    const emptyString = '' as unknown as number
+    const result = calculateTotalScore({
+      titleScore: emptyString,
+      workingPolicyScore: 100,
+      challengeScore: 50,
+      autonomyScore: 50,
+      salaryScore: 0,
+    })
+    expect(typeof result).toBe('string') // "" + 100 + 50 + 50 + 0 = "100500"
+    expect(result).not.toSatisfy((v: unknown) => typeof (v as { toFixed?: unknown }).toFixed === 'function')
+  })
+
+  it('returns a number when empty-string scores are coerced with Number(x || 0) — documents the fix', () => {
+    const emptyString = '' as unknown as number
+    const result = calculateTotalScore({
+      titleScore: Number(emptyString || 0),
+      workingPolicyScore: 100,
+      challengeScore: Number(emptyString || 0),
+      autonomyScore: Number(emptyString || 0),
+      salaryScore: 0,
+    })
+    expect(typeof result).toBe('number')
+    expect(result).toBe(100)
+  })
+
   it('sums all 5 components correctly', () => {
     expect(
       calculateTotalScore({
