@@ -51,11 +51,11 @@ function jobToCoreValues(job: JobApplication): CoreDetailsFormValues {
 
 function jobToScoringValues(job: JobApplication): ScoringFormValues {
   return {
-    titleScore: job.scoring.titleScore,
+    titleScore: Number(job.scoring.titleScore || 0),
     workingPolicy: job.scoring.workingPolicy,
     distanceModifier: String(job.scoring.distanceModifier),
-    challengeScore: job.scoring.challengeScore,
-    autonomyScore: job.scoring.autonomyScore,
+    challengeScore: Number(job.scoring.challengeScore || 0),
+    autonomyScore: Number(job.scoring.autonomyScore || 0),
   }
 }
 
@@ -110,10 +110,10 @@ export default function AddApplicationModal({ opened, onClose, onJobAdded, onJob
       ? 0
       : calculateSalaryScore(salaryMax, settings.salary.minimumSalary, settings.salary.targetSalary)
     const totalScore = calculateTotalScore({
-      titleScore: scoring.titleScore,
+      titleScore: Number(scoring.titleScore || 0),
       workingPolicyScore,
-      challengeScore: scoring.challengeScore,
-      autonomyScore: scoring.autonomyScore,
+      challengeScore: Number(scoring.challengeScore || 0),
+      autonomyScore: Number(scoring.autonomyScore || 0),
       salaryScore,
     })
 
